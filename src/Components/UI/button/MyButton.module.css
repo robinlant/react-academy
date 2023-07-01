@@ -5,4 +5,9 @@
     background:transparent;
     border: 1px solid teal;
     cursor: pointer;
+    transition: background-color 0.2s,color 0.2s;
+}
+.myButton:hover {
+    color:white;
+    background-color: teal;
 }

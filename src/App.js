@@ -1,8 +1,8 @@
 import {useState} from "react";
 import './styles/app.css';
 import PostList from "./Components/PostList";
-import MyButton from "./Components/UI/button/MyButton";
-import MyInput from "./Components/UI/input/MyInput";
+import PostForm from "./Components/PostForm";
+import MySelect from "./Components/UI/select/MySelect";
 
 function App() {
     const [posts,setPosts] = useState([
@@ -10,34 +10,22 @@ function App() {
         {id:2,title:'Javascript',body:'Description'},
         {id:3,title:'Javascript',body:'Description'}
     ]);
-    const [title,setTitle] = useState('');
-    const [body,setBody] = useState('');
-
-    const addNewPost = () => {
-        console.log('worked')
-        const newPost = {id:Date.now(),title:title,body:body}
-        setPosts([...posts, newPost])
-        setTitle('')
-        setBody('')
+    const createPost = (post) => {
+        setPosts([...posts,post])
+    }
+    const removePost = (post) => {
+        setPosts(posts.filter((p)=>p.id !== post.id))
     }
 
     return (
         <div className="App">
-            <form>
-                <MyInput
-                    value={title}
-                    onChange={(e) => {setTitle(e.target.value)}}
-                    type="text" placeholder="Post title"/>
-                <MyInput
-                    value={body}
-                    onChange={(e) => {setBody(e.target.value)}}
-                    type="text" placeholder="Post description"/>
-                <MyButton onClick={(e)=> {
-                    e.preventDefault();
-                    addNewPost()
-                }}>Create Post</MyButton>
-            </form>
-            <PostList posts={posts} title={'List'}/>
+            <PostForm  createPost={createPost}/>
+            <hr style={{margin:'15px 0'}}/>
+            <MySelect defaultValue={'Filter by'} options={}/>
+            {posts.length !== 0
+                ? <PostList posts={posts} title={'List'} removePost={removePost}/>
+                : <h2 style={{textAlign:"center"}}>Posts are not found</h2>
+            }
         </div>
     );
 }
