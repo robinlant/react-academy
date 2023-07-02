@@ -1,9 +1,8 @@
-import {useMemo, useState} from "react";
+import React, {useMemo, useState} from "react";
 import './styles/app.css';
 import PostList from "./Components/PostList";
 import PostForm from "./Components/PostForm";
-import MySelect from "./Components/UI/select/MySelect";
-import MyInput from "./Components/UI/input/MyInput";
+import PostFilter from "./Components/PostFilter";
 
 function App() {
     const [posts,setPosts] = useState([
@@ -11,21 +10,19 @@ function App() {
         {id:2,title:'Javascript',body:'aaDescription'},
         {id:3,title:'zz',body:'zzDescription'}
     ]);
-    const [selectedSort, setSelectedSort] = useState('')
-    const [searchQuery,setSearchQuery] = useState('')
-
+    const [filter,setFilter] = useState({sort:'title',query:''})
     const sortedPosts = useMemo(() => {
-        if (selectedSort) {
-            return [...posts].sort((a,b) => a[selectedSort].localeCompare(b[selectedSort]))
+        if (filter.sort) {
+            return [...posts].sort((a,b) => a[filter.sort].localeCompare(b[filter.sort]))
         }
         return posts
-    },[posts,selectedSort])
+    },[posts,filter.sort])
 
     const searchedAndSortedPosts = useMemo( () => {
             return sortedPosts.filter((post) => {
-                post.title.toLowerCase().includes(searchQuery.toLowerCase())
+                return post.title.toLowerCase().includes(filter.query.toLowerCase())
             })
-        }, [searchQuery,sortedPosts]
+        }, [filter.query,sortedPosts]
     )
 
     const createPost = (post) => {
@@ -39,7 +36,8 @@ function App() {
         <div className="App">
             <PostForm  createPost={createPost}/>
             <hr style={{margin:'15px 0',backgroundColor:'teal',border:'none',height:'1px'}}/>
-            <PostList posts={sortedPosts} title={'List'} removePost={removePost}/>
+            <PostFilter filter={filter} setFilter={setFilter}/>
+            <PostList posts={searchedAndSortedPosts} title={'List'} removePost={removePost}/>
         </div>
     );
 }
