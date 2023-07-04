@@ -9,15 +9,20 @@ import {usePosts} from "./hooks/usePosts";
 import {PostService} from "./API/PostService";
 import Loader from "./Components/UI/loader/Loader";
 import {useFetching} from "./hooks/useFetching";
+import {usePagination} from "./hooks/usePagination";
 
 function App() {
     const [posts,setPosts] = useState([]); // post list
     const [filter,setFilter] = useState({sort:'title',query:''}); // sort & query filters
     const [modal,setModal] = useState(false); // modal window state
     const searchedAndSortedPosts = usePosts(posts,filter.sort,filter.query); // sorted by filter posts
+    const [totalPosts,setTotalPosts] = useState(0); //totalCountOfPosts
+    const [pagesCount,pagesCountArray] = usePagination(totalPosts,10);
+    const [page,setPage] = useState(1); //on which page is user rn
     const [fetchPosts,isPostLoading,postError] = useFetching(async ()=>{
-        const response = await PostService.getAll();
+        const response = await PostService.getAll(10,1);
         setPosts(response.data);
+        setTotalPosts(response.headers['x-total-count'])
     })
 
     useEffect(()=>{
@@ -48,6 +53,13 @@ function App() {
             ? <Loader/>
             : <PostList posts={searchedAndSortedPosts} title={'List'} removePost={removePost}/>
             }
+            <div style={{margin:'30px 0',display:"flex",justifyContent:"center"}}>
+                {!isPostLoading &&
+                    pagesCountArray.map((e)=>{
+                        return <MyButton key={e}>{e}</MyButton>
+                    })
+                }
+            </div>
         </div>
     );
 }
