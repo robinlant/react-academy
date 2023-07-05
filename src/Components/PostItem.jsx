@@ -12,6 +12,12 @@ const PostItem = (props) => {
                 <div className="post__btns">
                     <MyButton onClick={(e)=>{
                         e.preventDefault()
+                        //props.readComments()
+                    }}>
+                        Comments
+                    </MyButton>
+                    <MyButton onClick={(e)=>{
+                        e.preventDefault()
                         props.removePost(props.post)
                     }}>Delete</MyButton>
                 </div>
