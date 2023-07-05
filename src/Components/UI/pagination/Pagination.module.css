@@ -1,0 +1,19 @@
+.pagination {
+    padding: 5px 15px;
+    color: teal;
+    font-size: 14px;
+    background:transparent;
+    border: 1px solid teal;
+    cursor: pointer;
+    transition: background-color 0.2s,color 0.2s;
+    margin:0 2px
+}
+.pagination:hover {
+    color:white;
+    background-color: teal;
+}
+.pagination.active {
+    color: white;
+    background:teal;
+    box-shadow:0 2px 5px 0 rgba(0,0,0,0.5);
+}

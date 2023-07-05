@@ -10,6 +10,7 @@ import {PostService} from "./API/PostService";
 import Loader from "./Components/UI/loader/Loader";
 import {useFetching} from "./hooks/useFetching";
 import {usePagination} from "./hooks/usePagination";
+import Pagination from "./Components/UI/pagination/Pagination";
 
 function App() {
     const [posts,setPosts] = useState([]); // post list
@@ -17,19 +18,21 @@ function App() {
     const [modal,setModal] = useState(false); // modal window state
     const searchedAndSortedPosts = usePosts(posts,filter.sort,filter.query); // sorted by filter posts
     const [totalPosts,setTotalPosts] = useState(0); //totalCountOfPosts
-    const [pagesCount,pagesCountArray] = usePagination(totalPosts,10);
     const [page,setPage] = useState(1); //on which page is user rn
+    const [postLimit,setPostLimit] = useState(10);
     const [fetchPosts,isPostLoading,postError] = useFetching(async ()=>{
-        const response = await PostService.getAll(10,1);
+        const response = await PostService.getAll(postLimit,page);
         setPosts(response.data);
         setTotalPosts(response.headers['x-total-count'])
     })
 
     useEffect(()=>{
         fetchPosts()
-    },[])
+    },[page])
 
-
+    function changePage(pageNum) {
+        setPage(pageNum)
+    }
 
     // callbacks to add/remove Post
     const createPost = (post) => {
@@ -53,11 +56,14 @@ function App() {
             ? <Loader/>
             : <PostList posts={searchedAndSortedPosts} title={'List'} removePost={removePost}/>
             }
-            <div style={{margin:'30px 0',display:"flex",justifyContent:"center"}}>
+            <div className={"pagination__wrap"}>
                 {!isPostLoading &&
-                    pagesCountArray.map((e)=>{
-                        return <MyButton key={e}>{e}</MyButton>
-                    })
+                    <Pagination
+                        postLimit={postLimit}
+                        page={page}
+                        changePage={changePage}
+                        totalPosts={totalPosts}
+                    />
                 }
             </div>
         </div>
