@@ -3,12 +3,9 @@ import cl from './Pagination.module.css';
 import {usePagination} from "../../../hooks/usePagination";
 
 const Pagination = ({totalPosts,page,changePage,postLimit}) => {
-
-
     const [pagesCount,pagesCountArray] = usePagination(totalPosts,postLimit);
 
     return (
-
         <div style={{}}>
             {
                 pagesCountArray.map((e)=>{
