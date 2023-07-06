@@ -1,7 +1,9 @@
 import React from 'react';
 import MyButton from "./UI/button/MyButton";
+import {useHistory} from "react-router-dom";
 
 const PostItem = (props) => {
+    const router = useHistory()
     return (
         <div>
             <div className="post">
@@ -10,9 +12,9 @@ const PostItem = (props) => {
                     <div>{props.post.body}</div>
                 </div>
                 <div className="post__btns">
-                    <MyButton onClick={(e)=>{
+                    <MyButton style={{marginRight:'3px'}} onClick={(e)=>{
                         e.preventDefault()
-                        //props.readComments()
+                        router.push(`/posts/${props.post.id}`)
                     }}>
                         Comments
                     </MyButton>

@@ -1,10 +1,11 @@
 import React from 'react';
-import Switch from "react-router-dom/es/Switch";
+import {Switch} from "react-router-dom";
 import {Route} from "react-router-dom";
 import About from "../pages/About";
 import Posts from "../pages/Posts";
 import Error from "../pages/Error";
-import Redirect from "react-router-dom/es/Redirect";
+import {Redirect} from "react-router-dom";
+import PostId from "../pages/PostId";
 
 const AppRouter = () => {
     return (
@@ -12,9 +13,13 @@ const AppRouter = () => {
             <Route path="/about">
                 <About/>
             </Route>
-            <Route path="/posts">
+            <Route exact path="/posts">
                 <Posts/>
             </Route>
+            <Route exact path="/posts/:id">
+                <PostId/>
+            </Route>
+
             <Route path="/404">
                 <Error/>
             </Route>
