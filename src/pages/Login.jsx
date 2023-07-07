@@ -5,7 +5,7 @@ import {AuthConext} from "../context";
 
 const Login = () => {
     const {isAuth, setIsAuth} = useContext(AuthConext);
-    const login = event => {
+    const login = (event) => {
         event.preventDefault();
         setIsAuth(true)
     }
