@@ -14,6 +14,7 @@ const PostFilter = ({filter,setFilter}) => {
                           value={filter.sort}
                           onChange={e => setFilter({...filter, sort:e.target.value})}
                           options={[
+                              {value:'id',name:'By ID'},
                               {value:'title',name:'By title'},
                               {value: 'body',name: 'By description'}
                           ]}/>

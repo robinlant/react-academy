@@ -12,7 +12,7 @@ import Pagination from "../Components/UI/pagination/Pagination";
 
 function Posts() {
     const [posts,setPosts] = useState([]); // post list
-    const [filter,setFilter] = useState({sort:'title',query:''}); // sort & query filters
+    const [filter,setFilter] = useState({sort:'id',query:''}); // sort & query filters
     const [modal,setModal] = useState(false); // modal window state
     const searchedAndSortedPosts = usePosts(posts,filter.sort,filter.query); // sorted by filter posts
     const [totalPosts,setTotalPosts] = useState(0); //totalCountOfPosts
@@ -20,7 +20,7 @@ function Posts() {
     const [postLimit,setPostLimit] = useState(10);
     const [fetchPosts,isPostLoading,postError] = useFetching(async ()=>{
         const response = await PostService.getAll(postLimit,page);
-        setPosts(response.data);
+        setPosts([...posts,...response.data]);
         setTotalPosts(response.headers['x-total-count'])
     })
 
@@ -50,9 +50,10 @@ function Posts() {
             { postError&&
                 <h2>Error happened: {postError}</h2>
             }
-            {isPostLoading
-                ? <Loader/>
-                : <PostList posts={searchedAndSortedPosts} title={'List'} removePost={removePost}/>
+            {isPostLoading && <Loader/> }
+            <PostList posts={searchedAndSortedPosts} title={'List'} removePost={removePost}/>
+            {!isPostLoading &&
+                <div style={{backgroundColor: 'firebrick', height: '5px'}}></div>
             }
             <div className={"pagination__wrap"}>
                 {!isPostLoading &&
