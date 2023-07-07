@@ -15,6 +15,7 @@ const Navbar = (linkArray) => {
                         <MyButton onClick={(e)=>{
                             e.preventDefault()
                             setIsAuth(false)
+                            localStorage.removeItem('auth')
                         }}>Logout</MyButton>
                     </div>
                 :   <div style={{marginLeft:'15px'}}>
