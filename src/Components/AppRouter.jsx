@@ -19,7 +19,6 @@ const AppRouter = () => {
             <Route exact path="/posts/:id">
                 <PostId/>
             </Route>
-
             <Route path="/404">
                 <Error/>
             </Route>
