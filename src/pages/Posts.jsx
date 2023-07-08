@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {PostService} from "../API/PostService";
 import MyButton from "../Components/UI/button/MyButton";
 import MyModal from "../Components/UI/modal/MyModal";
@@ -9,60 +9,66 @@ import {usePosts} from "../hooks/usePosts";
 import {useFetching} from "../hooks/useFetching";
 import Loader from "../Components/UI/loader/Loader";
 import Pagination from "../Components/UI/pagination/Pagination";
+import {usePagination} from "../hooks/usePagination";
 
 function Posts() {
-    const [posts,setPosts] = useState([]); // post list
-    const [filter,setFilter] = useState({sort:'id',query:''}); // sort & query filters
-    const [modal,setModal] = useState(false); // modal window state
-    const searchedAndSortedPosts = usePosts(posts,filter.sort,filter.query); // sorted by filter posts
-    const [totalPosts,setTotalPosts] = useState(0); //totalCountOfPosts
-    const [page,setPage] = useState(1); //on which page is user rn
-    const [postLimit,setPostLimit] = useState(10);
-    const [fetchPosts,isPostLoading,postError] = useFetching(async ()=>{
-        const response = await PostService.getAll(postLimit,page);
-        setPosts([...posts,...response.data]);
+    const [posts, setPosts] = useState([]);
+    const [filter, setFilter] = useState({sort: 'id', query: ''});
+    const [modal, setModal] = useState(false);
+    const searchedAndSortedPosts = usePosts(posts, filter.sort, filter.query);
+    const [totalPosts, setTotalPosts] = useState(0);
+    const [page, setPage] = useState(1);
+    const [postLimit, setPostLimit] = useState(10);
+    const lastElem = useRef();
+    const observer = useRef();
+    const [pagesCount, pagesCountArray] = usePagination(totalPosts, postLimit);
+    const [fetchPosts, isPostLoading, postError] = useFetching(async () => {
+        const response = await PostService.getAll(postLimit, page);
+        setPosts([...posts, ...response.data]);
         setTotalPosts(response.headers['x-total-count'])
-    })
+    });
 
-    useEffect(()=>{
-        fetchPosts()
-    },[page])
+    useEffect(() => {
+        if (lastElem.current) {
+            const callback = (entries) => {
+                if (entries[0].isIntersecting && !isPostLoading && page < pagesCount) {
+                    setPage(page + 1);
+                    console.log(`worked! current_page: ${page} posts_length:${posts.length}`)
+                }
+            };
+            observer.current = new IntersectionObserver(callback);
+            observer.current.observe(lastElem.current);
+        }
+        return () => observer.current && observer.current.disconnect();
+    }, [isPostLoading, page, pagesCount]);
 
-    function changePage(pageNum) {
-        setPage(pageNum)
-    }
+    useEffect(() => {
+        fetchPosts();
+    }, [page]);
 
-    // callbacks to add/remove Post
     const createPost = (post) => {
-        setPosts([...posts,post])
+        setPosts([...posts, post])
         setModal(false)
-    }
+    };
+
     const removePost = (post) => {
-        setPosts(posts.filter((p)=>p.id !== post.id))
-    }
+        setPosts(posts.filter(p => p.id !== post.id))
+    };
+
     return (
         <div className="App">
-            <MyButton style={{marginTop:'30px'}} onClick={()=>setModal(true)}>Create Post</MyButton>
+            <MyButton style={{marginTop: '30px'}} onClick={() => setModal(true)}>Create Post</MyButton>
             <MyModal visible={modal} setVisible={setModal}>
-                <PostForm  createPost={createPost}/>
+                <PostForm createPost={createPost}/>
             </MyModal>
             <PostFilter filter={filter} setFilter={setFilter}/>
-            { postError&&
-                <h2>Error happened: {postError}</h2>
-            }
-            {isPostLoading && <Loader/> }
+            {postError && <h2>Error happened: {postError}</h2>}
+            {isPostLoading && <Loader/>}
             <PostList posts={searchedAndSortedPosts} title={'List'} removePost={removePost}/>
-            {!isPostLoading &&
-                <div style={{backgroundColor: 'firebrick', height: '5px'}}></div>
-            }
-            <div className={"pagination__wrap"}>
+            <div ref={lastElem} style={{height: '20px'}}></div>
+            <div className="pagination__wrap">
                 {!isPostLoading &&
-                    <Pagination
-                        postLimit={postLimit}
-                        page={page}
-                        changePage={changePage}
-                        totalPosts={totalPosts}
-                    />
+                    <Pagination page={page} changePage={setPage} pagesCountArray={pagesCountArray}/>
                 }
             </div>
         </div>
